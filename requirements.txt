@@ -1,0 +1,8 @@
+librosa
+torch
+torchaudio
+numpy 
+matplotlib 
+opencv-python 
+scikit-learn 
+tqdm
