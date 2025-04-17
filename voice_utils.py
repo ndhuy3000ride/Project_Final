@@ -9,13 +9,10 @@ from tensorflow import keras
 import json
 from collections import Counter
 
-
-os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+# model_path = 'models/voice_classification_cnn_v2.h5'
+# label_path = 'models/class_labels_2.json'
 
 IMAGE_SIZE = (128, 128)  # Cập nhật để khớp với model
-
-model_path = "models/voice_classification_cnn_v2.h5"
-label_path = "models/class_labels_2.json"
 
 def plot_spectrogram(audio_path, segment_duration=3, save_dir=None, use_mel=True):
     """Chuyển audio thành các ảnh Mel Spectrogram và lưu vào thư mục."""
@@ -59,7 +56,7 @@ def plot_spectrogram(audio_path, segment_duration=3, save_dir=None, use_mel=True
 
     ipd.display(ipd.Audio(audio_path))
 
-def predict_speaker_from_folder(folder_path, model_path=model_path, label_path=label_path):
+def predict_speaker_from_folder(folder_path, model_path, label_path):
     """Dự đoán speaker từ folder chứa nhiều ảnh spectrogram và tính độ chính xác trung bình."""
 
     # Load mô hình
@@ -114,16 +111,16 @@ def clear_folder(folder_path):
             os.remove(file_path)
 
 
-audio_path = "Data/Data_test/Voice_10/v10_test.mp3"
-mel_save_dir = "Data/Temp"
+# audio_path = "Data/Data_test/Voice_10/BTV Việt Hà - Dự Báo Thời Tiết.mp3"
+# mel_save_dir = "Data/Temp"
 
 
-# Bước 1: Tạo Mel Spectrogram từ audio
-plot_spectrogram(audio_path, save_dir=mel_save_dir, use_mel=True)
+# # Bước 1: Tạo Mel Spectrogram từ audio
+# plot_spectrogram(audio_path, save_dir=mel_save_dir, use_mel=True)
 
-# Bước 2: Dự đoán speaker
-speaker, confidence = predict_speaker_from_folder(mel_save_dir, model_path, label_path)
-print(f"🔊 Dự đoán người nói: {speaker} với độ tin cậy: {confidence:.2f}")
+# # Bước 2: Dự đoán speaker
+# speaker, confidence = predict_speaker_from_folder(mel_save_dir, model_path, label_path)
+# print(f"🔊 Dự đoán người nói: {speaker} với độ tin cậy: {confidence:.2f}")
 
-# Bước 3: Xoá ảnh sau khi test
-clear_folder(mel_save_dir)
+# # Bước 3: Xoá ảnh sau khi test
+# clear_folder(mel_save_dir)
