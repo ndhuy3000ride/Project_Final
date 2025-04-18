@@ -5,7 +5,7 @@ import os
 import tempfile
 from voice_utils import plot_spectrogram, predict_speaker_from_folder, clear_folder
 
-MODEL_PATH = 'models/voice_classification_cnn_v2.h5'
+MODEL_PATH = 'models/voice_classification_resnet50.h5'
 LABEL_PATH = 'models/class_labels_2.json'
 TEMP_IMAGE_DIR = 'Data/Temp'
 

@@ -12,7 +12,8 @@ from collections import Counter
 # model_path = 'models/voice_classification_cnn_v2.h5'
 # label_path = 'models/class_labels_2.json'
 
-IMAGE_SIZE = (128, 128)  # Cập nhật để khớp với model
+# IMAGE_SIZE = (128, 128)  # Cập nhật để khớp với model CNN
+IMAGE_SIZE = (224, 224)  # Cập nhật để khớp với model ResNet50
 
 def plot_spectrogram(audio_path, segment_duration=3, save_dir=None, use_mel=True):
     """Chuyển audio thành các ảnh Mel Spectrogram và lưu vào thư mục."""

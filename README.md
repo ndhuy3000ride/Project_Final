@@ -69,12 +69,16 @@ python train.py --model resnet --epochs 40
 | VGG16    | 91.3%    |
 | ResNet18 | 92.7%    |
 
+*Làm Bảng kết quả đánh giá => đọc research paper*
+*Tìm hiểu thang đo đánh giá F1_score, Precision, ReCall => Confusion matrix : ma trận nhầm lẫn (học thuộc và tìm hiểu các thành phần) => task 1* 
+
+*Truy xuất kết quả hàm mất mát loss function trong quá trình train*
 
 ## ✅ TODO
 
 - Huấn luyện mô hình CNN, VGG, ResNet
 
-- Xử lý khử nhiễu âm thanh
+- Xử lý khử nhiễu âm thanh => task 2
 
 - Chuyển âm thanh thành ảnh
 
