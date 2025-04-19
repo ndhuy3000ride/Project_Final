@@ -27,6 +27,6 @@ def remove_silence_and_save(audio_path, save_path, top_db=30):
     print(f"✅ Đã lưu file sau khi loại khoảng im lặng: {save_path}")
 
 remove_silence_and_save(
-    audio_path='Data/Data_Raw/voice_unknown.mp3',
-    save_path='Data/Data_preprocessing/voice_unknown_denoising.mp3'
+    audio_path='Data/Data_test/Voice_10/v7test.mp3',
+    save_path='Data/Data_test/Voice_10/chi7.mp3'
 )
