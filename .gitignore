@@ -1,0 +1,2 @@
+# Bỏ qua file model lớn
+models/voice_classification_resnet50.h5
