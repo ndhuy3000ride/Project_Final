@@ -8,8 +8,9 @@ from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow import keras
 import json
 from collections import Counter
+import soundfile as sf
 
-# model_path = 'models/voice_classification_cnn_v2.h5'
+# model_path = 'models/voice_classification_resnet50.h5'
 # label_path = 'models/class_labels_2.json'
 
 IMAGE_SIZE = (128, 128)  # Cập nhật để khớp với model CNN
@@ -111,17 +112,31 @@ def clear_folder(folder_path):
         if os.path.isfile(file_path) and file_path.endswith(('.png', '.jpg', '.jpeg')):
             os.remove(file_path)
 
-
-# audio_path = "Data/Data_test/Voice_10/BTV Việt Hà - Dự Báo Thời Tiết.mp3"
+def remove_silence_and_save(audio_path, save_path, top_db=30):
+    """
+    Loại bỏ khoảng im lặng trong file âm thanh và lưu ra file mới.
+    
+    Args:
+        audio_path (str): Đường dẫn tới file âm thanh đầu vào (.wav hoặc .mp3)
+        save_path (str): Đường dẫn lưu file âm thanh đầu ra sau khi xử lý
+        top_db (int): Ngưỡng dB để xác định khoảng im lặng (mặc định 30)
+    """
+    y, sr = librosa.load(audio_path, sr=None)
+    intervals = librosa.effects.split(y, top_db=top_db)
+    y_speech = np.concatenate([y[start:end] for start, end in intervals])
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    sf.write(save_path, y_speech, sr)
+    
+# audio_path = "Data/Data_test/Voice_10/v10_test.mp3"
 # mel_save_dir = "Data/Temp"
 
 
-# # Bước 1: Tạo Mel Spectrogram từ audio
+# # # Bước 1: Tạo Mel Spectrogram từ audio
 # plot_spectrogram(audio_path, save_dir=mel_save_dir, use_mel=True)
 
-# # Bước 2: Dự đoán speaker
+# # # Bước 2: Dự đoán speaker
 # speaker, confidence = predict_speaker_from_folder(mel_save_dir, model_path, label_path)
 # print(f"🔊 Dự đoán người nói: {speaker} với độ tin cậy: {confidence:.2f}")
 
-# # Bước 3: Xoá ảnh sau khi test
+# # # Bước 3: Xoá ảnh sau khi test
 # clear_folder(mel_save_dir)
