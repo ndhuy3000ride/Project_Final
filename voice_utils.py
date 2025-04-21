@@ -9,12 +9,13 @@ from tensorflow import keras
 import json
 from collections import Counter
 import soundfile as sf
+from tensorflow.keras.applications.resnet50 import preprocess_input
 
 # model_path = 'models/voice_classification_resnet50.h5'
 # label_path = 'models/class_labels_2.json'
 
-IMAGE_SIZE = (128, 128)  # Cập nhật để khớp với model CNN
-# IMAGE_SIZE = (224, 224)  # Cập nhật để khớp với model ResNet50
+# IMAGE_SIZE = (128, 128)  # Cập nhật để khớp với model CNN
+IMAGE_SIZE = (224, 224)  # Cập nhật để khớp với model ResNet50
 
 def plot_spectrogram(audio_path, segment_duration=3, save_dir=None, use_mel=True):
     """Chuyển audio thành các ảnh Mel Spectrogram và lưu vào thư mục."""
@@ -84,9 +85,10 @@ def predict_speaker_from_folder(folder_path, model_path, label_path):
 
         # Load và tiền xử lý ảnh
         img = load_img(image_path, target_size=IMAGE_SIZE)
-        img_array = img_to_array(img) / 255.0  # Chuẩn hóa
+        # img_array = img_to_array(img) / 255.0  # Chuẩn hóa cho CNN
+        img_array = img_to_array(img)
+        img_array = preprocess_input(img_array)
         img_array = np.expand_dims(img_array, axis=0)  # Thêm batch dimension
-
         # Dự đoán
         preds = model.predict(img_array)
         predicted_class = np.argmax(preds)

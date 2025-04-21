@@ -3,8 +3,8 @@ import os
 import tempfile
 from voice_utils import plot_spectrogram, predict_speaker_from_folder, clear_folder, remove_silence_and_save
 
-MODEL_PATH = 'models/voice_classification_cnn_v3.h5'
-LABEL_PATH = 'models/class_labels_2.json'
+MODEL_PATH = 'checkpoints/voice_classification_resnet50_v2.h5'
+LABEL_PATH = 'checkpoints/class_labels_2.json'
 TEMP_IMAGE_DIR = 'Data/Temp'
 
 st.set_page_config(page_title="Voice Classifier", page_icon="🔊")
