@@ -9,16 +9,8 @@ from tensorflow import keras
 import json
 from collections import Counter
 import soundfile as sf
-from tensorflow.keras.applications.resnet50 import preprocess_input
-
-# model_path = 'models/voice_classification_resnet50.h5'
-# label_path = 'models/class_labels_2.json'
-
-# IMAGE_SIZE = (128, 128)  # Cập nhật để khớp với model CNN
-IMAGE_SIZE = (224, 224)  # Cập nhật để khớp với model ResNet50
 
 def plot_spectrogram(audio_path, segment_duration=3, save_dir=None, use_mel=True):
-    """Chuyển audio thành các ảnh Mel Spectrogram và lưu vào thư mục."""
     y, sr = librosa.load(audio_path, sr=None)
     segment_samples = segment_duration * sr
 
@@ -59,20 +51,14 @@ def plot_spectrogram(audio_path, segment_duration=3, save_dir=None, use_mel=True
 
     ipd.display(ipd.Audio(audio_path))
 
-def predict_speaker_from_folder(folder_path, model_path, label_path):
-    """Dự đoán speaker từ folder chứa nhiều ảnh spectrogram và tính độ chính xác trung bình."""
-
-    # Load mô hình
+def predict_speaker_from_folder(folder_path, model_path, label_path, image_size, preprocess_func):
     model = keras.models.load_model(model_path)
 
-    # Load nhãn
     with open(label_path, 'r') as f:
         class_indices = json.load(f)
-    index_to_class = {v: k for k, v in class_indices.items()}  # map index -> label
+    index_to_class = {v: k for k, v in class_indices.items()}
 
-    # Danh sách ảnh trong folder
     image_files = [f for f in os.listdir(folder_path) if f.endswith(('.png', '.jpg', '.jpeg'))]
-
     if not image_files:
         print("❌ Không tìm thấy ảnh trong folder!")
         return None
@@ -82,63 +68,30 @@ def predict_speaker_from_folder(folder_path, model_path, label_path):
 
     for image_file in image_files:
         image_path = os.path.join(folder_path, image_file)
-
-        # Load và tiền xử lý ảnh
-        img = load_img(image_path, target_size=IMAGE_SIZE)
-        # img_array = img_to_array(img) / 255.0  # Chuẩn hóa cho CNN
+        img = load_img(image_path, target_size=image_size)
         img_array = img_to_array(img)
-        img_array = preprocess_input(img_array)
-        img_array = np.expand_dims(img_array, axis=0)  # Thêm batch dimension
-        # Dự đoán
+        img_array = preprocess_func(img_array)
+        img_array = np.expand_dims(img_array, axis=0)
+
         preds = model.predict(img_array)
         predicted_class = np.argmax(preds)
-        class_labels = index_to_class  # dùng mapping từ file json đã load
-        # class_labels = list(train_generator.class_indices.keys())  # Lấy nhãn class
-
-        # predictions.append(class_labels[predicted_class])
         predictions.append(index_to_class[predicted_class])
-        confidences.append(preds[0][predicted_class])  # Lưu độ tự tin
+        confidences.append(preds[0][predicted_class])
 
-    # Lấy speaker được dự đoán nhiều nhất
     most_common_speaker, count = Counter(predictions).most_common(1)[0]
-
-    # Tính độ chính xác trung bình
     avg_confidence = np.mean(confidences)
 
     return most_common_speaker, avg_confidence
 
 def clear_folder(folder_path):
-    """Xóa toàn bộ ảnh trong thư mục sau khi test xong."""
     for file in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file)
         if os.path.isfile(file_path) and file_path.endswith(('.png', '.jpg', '.jpeg')):
             os.remove(file_path)
 
 def remove_silence_and_save(audio_path, save_path, top_db=30):
-    """
-    Loại bỏ khoảng im lặng trong file âm thanh và lưu ra file mới.
-    
-    Args:
-        audio_path (str): Đường dẫn tới file âm thanh đầu vào (.wav hoặc .mp3)
-        save_path (str): Đường dẫn lưu file âm thanh đầu ra sau khi xử lý
-        top_db (int): Ngưỡng dB để xác định khoảng im lặng (mặc định 30)
-    """
     y, sr = librosa.load(audio_path, sr=None)
     intervals = librosa.effects.split(y, top_db=top_db)
     y_speech = np.concatenate([y[start:end] for start, end in intervals])
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     sf.write(save_path, y_speech, sr)
-    
-# audio_path = "Data/Data_test/Voice_10/v10_test.mp3"
-# mel_save_dir = "Data/Temp"
-
-
-# # # Bước 1: Tạo Mel Spectrogram từ audio
-# plot_spectrogram(audio_path, save_dir=mel_save_dir, use_mel=True)
-
-# # # Bước 2: Dự đoán speaker
-# speaker, confidence = predict_speaker_from_folder(mel_save_dir, model_path, label_path)
-# print(f"🔊 Dự đoán người nói: {speaker} với độ tin cậy: {confidence:.2f}")
-
-# # # Bước 3: Xoá ảnh sau khi test
-# clear_folder(mel_save_dir)
