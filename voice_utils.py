@@ -51,7 +51,7 @@ def plot_spectrogram(audio_path, segment_duration=3, save_dir=None, use_mel=True
 
     ipd.display(ipd.Audio(audio_path))
 
-def predict_speaker_from_folder(folder_path, model_path, label_path, image_size, preprocess_func):
+def predict_speaker_from_folder(folder_path, model_path, label_path, image_size, preprocess_func, entropy_threshold=0.4):
     model = keras.models.load_model(model_path)
 
     with open(label_path, 'r') as f:
@@ -63,8 +63,9 @@ def predict_speaker_from_folder(folder_path, model_path, label_path, image_size,
         print("❌ Không tìm thấy ảnh trong folder!")
         return None
 
-    predictions = []
-    confidences = []
+    # predictions = []
+    # confidences = []
+    all_predictions = []
 
     for image_file in image_files:
         image_path = os.path.join(folder_path, image_file)
@@ -73,15 +74,29 @@ def predict_speaker_from_folder(folder_path, model_path, label_path, image_size,
         img_array = preprocess_func(img_array)
         img_array = np.expand_dims(img_array, axis=0)
 
-        preds = model.predict(img_array)
-        predicted_class = np.argmax(preds)
-        predictions.append(index_to_class[predicted_class])
-        confidences.append(preds[0][predicted_class])
+        preds = model.predict(img_array)[0]
+        all_predictions.append(preds)
 
-    most_common_speaker, count = Counter(predictions).most_common(1)[0]
-    avg_confidence = np.mean(confidences)
+        # preds = model.predict(img_array)
+        # predicted_class = np.argmax(preds)
+        # predictions.append(index_to_class[predicted_class])
+        # confidences.append(preds[0][predicted_class])
 
-    return most_common_speaker, avg_confidence
+    # most_common_speaker, count = Counter(predictions).most_common(1)[0]
+    # avg_confidence = np.mean(confidences)
+    avg_preds = np.mean(all_predictions, axis=0)
+
+    entropy = -np.sum(avg_preds * np.log2(avg_preds + 1e-10))
+    max_entropy = -np.log2(1/len(avg_preds)) 
+    normalized_entropy = entropy / max_entropy
+
+    # return most_common_speaker, avg_confidence
+    if normalized_entropy > entropy_threshold:
+        return "Unknown Speaker", np.max(avg_preds)
+    else:
+        predicted_class = np.argmax(avg_preds)
+        return index_to_class[predicted_class], np.max(avg_preds)
+
 
 def clear_folder(folder_path):
     for file in os.listdir(folder_path):

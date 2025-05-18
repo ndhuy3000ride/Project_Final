@@ -10,23 +10,25 @@ from voice_utils import (
 from tensorflow.keras.applications.resnet50 import preprocess_input as resnet_preprocess
 from tensorflow.keras.applications.vgg16 import preprocess_input as vgg_preprocess
 
+
+ENTROPY_THRESHOLD = 0.25
 # ==== Định nghĩa mô hình ====
 MODEL_OPTIONS = {
     "ResNet50 v2": {
         "model_path": "checkpoints/voice_classification_resnet50_v2.h5",
-        "label_path": "checkpoints/class_labels_2.json",
+        "label_path": "checkpoints/class_labels.json",
         "image_size": (224, 224),
         "preprocess_func": resnet_preprocess
     },
     "VGG16": {
-        "model_path": "checkpoints/voice_classification_vgg16.h5",
-        "label_path": "checkpoints/class_labels_2.json",
+        "model_path": "checkpoints/vgg16_model.h5",
+        "label_path": "checkpoints/class_labels.json",
         "image_size": (224, 224),
-        "preprocess_func": vgg_preprocess
+        "preprocess_func": lambda x: x / 255.0
     },
     "Custom CNN": {
-        "model_path": "checkpoints/voice_classification_cnn_v3.h5",
-        "label_path": "checkpoints/class_labels_2.json",
+        "model_path": "checkpoints/cnn_model_final.h5",
+        "label_path": "checkpoints/class_labels.json",
         "image_size": (128, 128),
         "preprocess_func": lambda x: x / 255.0
     }
@@ -65,9 +67,10 @@ if uploaded_file is not None:
     with st.spinner("Processing audio..."):
         remove_silence_and_save(temp_audio_path, denoised_audio_path)
         plot_spectrogram(denoised_audio_path, save_dir=TEMP_IMAGE_DIR)
+        # plot_spectrogram(temp_audio_path, save_dir=TEMP_IMAGE_DIR)
 
         speaker, confidence = predict_speaker_from_folder(
-            TEMP_IMAGE_DIR, MODEL_PATH, LABEL_PATH, IMAGE_SIZE, PREPROCESS_FUNC
+            TEMP_IMAGE_DIR, MODEL_PATH, LABEL_PATH, IMAGE_SIZE, PREPROCESS_FUNC, ENTROPY_THRESHOLD
         )
 
         clear_folder(TEMP_IMAGE_DIR)
