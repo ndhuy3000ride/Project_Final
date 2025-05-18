@@ -14,12 +14,6 @@ from tensorflow.keras.applications.vgg16 import preprocess_input as vgg_preproce
 ENTROPY_THRESHOLD = 0.25
 # ==== Định nghĩa mô hình ====
 MODEL_OPTIONS = {
-    "ResNet50 v2": {
-        "model_path": "checkpoints/voice_classification_resnet50_v2.h5",
-        "label_path": "checkpoints/class_labels.json",
-        "image_size": (224, 224),
-        "preprocess_func": resnet_preprocess
-    },
     "VGG16": {
         "model_path": "checkpoints/vgg16_model.h5",
         "label_path": "checkpoints/class_labels.json",
@@ -31,7 +25,25 @@ MODEL_OPTIONS = {
         "label_path": "checkpoints/class_labels.json",
         "image_size": (128, 128),
         "preprocess_func": lambda x: x / 255.0
-    }
+    },
+    "Vision Transformer (ViT)": {
+        "model_path": "checkpoints/final_vit_model.h5",
+        "label_path": "checkpoints/class_labels.json",
+        "image_size": (128, 128),
+        "preprocess_func": lambda x: x / 255.0
+    },
+    "MobileNetV2": {
+        "model_path": "checkpoints/mobilenetv2_model.h5",
+        "label_path": "checkpoints/class_labels.json",
+        "image_size": (128, 128),
+        "preprocess_func": lambda x: x / 255.0
+    },
+    "CNN - LSTM": {
+        "model_path": "checkpoints/cnn_lstm_model_final.h5",
+        "label_path": "checkpoints/class_labels.json",
+        "image_size": (128, 128),
+        "preprocess_func": lambda x: x / 255.0
+    },
 }
 
 # ==== Giao diện ====
