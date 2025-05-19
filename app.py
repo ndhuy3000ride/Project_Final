@@ -7,43 +7,45 @@ from voice_utils import (
     clear_folder,
     remove_silence_and_save
 )
-from tensorflow.keras.applications.resnet50 import preprocess_input as resnet_preprocess
-from tensorflow.keras.applications.vgg16 import preprocess_input as vgg_preprocess
 
-
-ENTROPY_THRESHOLD = 0.25
+ENTROPY_THRESHOLD = 0.35
 # ==== Định nghĩa mô hình ====
 MODEL_OPTIONS = {
     "VGG16": {
         "model_path": "checkpoints/vgg16_model.h5",
         "label_path": "checkpoints/class_labels.json",
-        "image_size": (224, 224),
-        "preprocess_func": lambda x: x / 255.0
+        "image_size": (224, 224)
     },
     "Custom CNN": {
         "model_path": "checkpoints/cnn_model_final.h5",
         "label_path": "checkpoints/class_labels.json",
-        "image_size": (128, 128),
-        "preprocess_func": lambda x: x / 255.0
+        "image_size": (128, 128)
     },
     "Vision Transformer (ViT)": {
         "model_path": "checkpoints/final_vit_model.h5",
         "label_path": "checkpoints/class_labels.json",
-        "image_size": (128, 128),
-        "preprocess_func": lambda x: x / 255.0
+        "image_size": (128, 128)
+    },
+    "ResNet50": {
+        "model_path": "checkpoints/resnet50_model.h5",
+        "label_path": "checkpoints/class_labels.json",
+        "image_size": (224, 224)
     },
     "MobileNetV2": {
         "model_path": "checkpoints/mobilenetv2_model.h5",
         "label_path": "checkpoints/class_labels.json",
-        "image_size": (128, 128),
-        "preprocess_func": lambda x: x / 255.0
+        "image_size": (128, 128)
     },
     "CNN - LSTM": {
         "model_path": "checkpoints/cnn_lstm_model_final.h5",
         "label_path": "checkpoints/class_labels.json",
-        "image_size": (128, 128),
-        "preprocess_func": lambda x: x / 255.0
+        "image_size": (128, 128)
     },
+    "Custom CNN - VGG16 Fusion": {
+        "model_path": "checkpoints/vgg16_cnn_fusion_finetuned.h5",
+        "label_path": "checkpoints/class_labels.json",
+        "image_size": (128, 128)
+    }
 }
 
 # ==== Giao diện ====
@@ -81,14 +83,20 @@ if uploaded_file is not None:
         plot_spectrogram(denoised_audio_path, save_dir=TEMP_IMAGE_DIR)
         # plot_spectrogram(temp_audio_path, save_dir=TEMP_IMAGE_DIR)
 
-        speaker, confidence = predict_speaker_from_folder(
-            TEMP_IMAGE_DIR, MODEL_PATH, LABEL_PATH, IMAGE_SIZE, PREPROCESS_FUNC, ENTROPY_THRESHOLD
+        speaker, confidence, closest_speaker = predict_speaker_from_folder(
+            TEMP_IMAGE_DIR, MODEL_PATH, LABEL_PATH, IMAGE_SIZE, ENTROPY_THRESHOLD
         )
 
         clear_folder(TEMP_IMAGE_DIR)
 
     if speaker:
-        st.success(f"✅ Predicted Speaker: **{speaker}**")
-        st.info(f"Confidence: **{confidence:.2f}**")
+        if speaker == "Unknown Speaker":
+            st.warning(
+                f"❓ Predicted: **Unknown Speaker** (Closest: **{closest_speaker}**, Confidence: {confidence:.2f})"
+            )
+            st.info(f"The system is not confident enough. The most likely match is: **{closest_speaker}**.")
+        else:
+            st.success(f"✅ Predicted Speaker: **{speaker}**")
+            st.info(f"Confidence: **{confidence:.2f}**")
     else:
         st.error("❌ No spectrogram images found for prediction.")

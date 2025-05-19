@@ -1,5 +1,5 @@
 from tensorflow.keras import layers, models
-from base_model import BaseVoiceClassifier
+from models.pipeline import BaseVoiceClassifier
 
 class CNNClassifier(BaseVoiceClassifier):
     def __init__(self, dataset_path):

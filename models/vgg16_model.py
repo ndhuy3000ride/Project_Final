@@ -1,7 +1,7 @@
 from tensorflow.keras import layers, models
 from tensorflow.keras.applications import VGG16
 from tensorflow.keras.applications.vgg16 import preprocess_input
-from base_model import BaseVoiceClassifier
+from models.pipeline import BaseVoiceClassifier
 
 class VGG16Classifier(BaseVoiceClassifier):
     def __init__(self, dataset_path):

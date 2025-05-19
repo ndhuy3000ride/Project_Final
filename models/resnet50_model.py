@@ -1,7 +1,7 @@
 from tensorflow.keras import layers, models
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.applications.resnet50 import preprocess_input
-from base_model import BaseVoiceClassifier
+from models.pipeline import BaseVoiceClassifier
 
 class ResNet50Classifier(BaseVoiceClassifier):
     def __init__(self, dataset_path):
