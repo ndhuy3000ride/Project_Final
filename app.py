@@ -61,7 +61,6 @@ selected_model = MODEL_OPTIONS[selected_model_name]
 MODEL_PATH = selected_model["model_path"]
 LABEL_PATH = selected_model["label_path"]
 IMAGE_SIZE = selected_model["image_size"]
-PREPROCESS_FUNC = selected_model["preprocess_func"]
 
 TEMP_IMAGE_DIR = 'Data/Temp'
 
